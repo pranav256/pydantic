@@ -447,6 +447,281 @@ def not_in(self: _Pipeline[_InT, _OutT], values: Container[_OutT]) -> _Pipeline[
 
 ```
 
+### datetime_tz_naive
+
+```python
+datetime_tz_naive() -> _Pipeline[_InT, datetime]
+
+```
+
+Constrain a datetime value to be timezone-naive (i.e. have no tzinfo).
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def datetime_tz_naive(self: _Pipeline[_InT, datetime.datetime]) -> _Pipeline[_InT, datetime.datetime]:
+    """Constrain a datetime value to be timezone-naive (i.e. have no tzinfo)."""
+    return self.constrain(annotated_types.Timezone(None))
+
+```
+
+### datetime_tz_aware
+
+```python
+datetime_tz_aware() -> _Pipeline[_InT, datetime]
+
+```
+
+Constrain a datetime value to be timezone-aware (i.e. have a non-None tzinfo).
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def datetime_tz_aware(self: _Pipeline[_InT, datetime.datetime]) -> _Pipeline[_InT, datetime.datetime]:
+    """Constrain a datetime value to be timezone-aware (i.e. have a non-None tzinfo)."""
+    return self.constrain(annotated_types.Timezone(...))
+
+```
+
+### datetime_tz
+
+```python
+datetime_tz(tz: tzinfo) -> _Pipeline[_InT, datetime]
+
+```
+
+Constrain a datetime value to have a specific timezone.
+
+Parameters:
+
+| Name | Type | Description | Default | | --- | --- | --- | --- | | `tz` | `tzinfo` | The required timezone. | *required* |
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def datetime_tz(
+    self: _Pipeline[_InT, datetime.datetime], tz: datetime.tzinfo
+) -> _Pipeline[_InT, datetime.datetime]:
+    """Constrain a datetime value to have a specific timezone.
+
+    Args:
+        tz: The required timezone.
+    """
+    return self.constrain(annotated_types.Timezone(tz))  # type: ignore
+
+```
+
+### datetime_with_tz
+
+```python
+datetime_with_tz(
+    tz: tzinfo | None,
+) -> _Pipeline[_InT, datetime]
+
+```
+
+Transform a datetime value by replacing its timezone with the given value.
+
+Unlike `datetime_tz()`, this does not validate the existing timezone, it unconditionally sets tzinfo to `tz`.
+
+Parameters:
+
+| Name | Type | Description | Default | | --- | --- | --- | --- | | `tz` | `tzinfo | None` | The timezone to attach to the datetime, or None to make it naive. | *required* |
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def datetime_with_tz(
+    self: _Pipeline[_InT, datetime.datetime], tz: datetime.tzinfo | None
+) -> _Pipeline[_InT, datetime.datetime]:
+    """Transform a datetime value by replacing its timezone with the given value.
+
+    Unlike `datetime_tz()`, this does not validate the existing timezone, it
+    unconditionally sets [`tzinfo`][datetime.datetime.tzinfo] to `tz`.
+
+    Args:
+        tz: The timezone to attach to the datetime, or `None` to make it naive.
+    """
+    return self.transform(partial(datetime.datetime.replace, tzinfo=tz))
+
+```
+
+### str_lower
+
+```python
+str_lower() -> _Pipeline[_InT, str]
+
+```
+
+Transform a string value to lowercase.
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_lower(self: _Pipeline[_InT, str]) -> _Pipeline[_InT, str]:
+    """Transform a string value to [lowercase][str.lower]."""
+    return self.transform(str.lower)
+
+```
+
+### str_upper
+
+```python
+str_upper() -> _Pipeline[_InT, str]
+
+```
+
+Transform a string value to uppercase.
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_upper(self: _Pipeline[_InT, str]) -> _Pipeline[_InT, str]:
+    """Transform a string value to [uppercase][str.upper]."""
+    return self.transform(str.upper)
+
+```
+
+### str_title
+
+```python
+str_title() -> _Pipeline[_InT, str]
+
+```
+
+Transform a string value to title case.
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_title(self: _Pipeline[_InT, str]) -> _Pipeline[_InT, str]:
+    """Transform a string value to [title case][str.title]."""
+    return self.transform(str.title)
+
+```
+
+### str_strip
+
+```python
+str_strip() -> _Pipeline[_InT, str]
+
+```
+
+Strip leading and trailing whitespace from a string value.
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_strip(self: _Pipeline[_InT, str]) -> _Pipeline[_InT, str]:
+    """Strip leading and trailing whitespace from a string value."""
+    return self.transform(str.strip)
+
+```
+
+### str_pattern
+
+```python
+str_pattern(pattern: str) -> _Pipeline[_InT, str]
+
+```
+
+Constrain a string value to match a regular expression pattern.
+
+Parameters:
+
+| Name | Type | Description | Default | | --- | --- | --- | --- | | `pattern` | `str` | The regular expression pattern the string must match. | *required* |
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_pattern(self: _Pipeline[_InT, str], pattern: str) -> _Pipeline[_InT, str]:
+    """Constrain a string value to match a regular expression pattern.
+
+    Args:
+        pattern: The regular expression pattern the string must match.
+    """
+    return self.constrain(re.compile(pattern))
+
+```
+
+### str_contains
+
+```python
+str_contains(substring: str) -> _Pipeline[_InT, str]
+
+```
+
+Constrain a string value to contain a given substring.
+
+Parameters:
+
+| Name | Type | Description | Default | | --- | --- | --- | --- | | `substring` | `str` | The substring that must be present in the string. | *required* |
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_contains(self: _Pipeline[_InT, str], substring: str) -> _Pipeline[_InT, str]:
+    """Constrain a string value to contain a given substring.
+
+    Args:
+        substring: The substring that must be present in the string.
+    """
+    return self.predicate(lambda v: substring in v)
+
+```
+
+### str_starts_with
+
+```python
+str_starts_with(prefix: str) -> _Pipeline[_InT, str]
+
+```
+
+Constrain a string value to start with a given prefix.
+
+Parameters:
+
+| Name | Type | Description | Default | | --- | --- | --- | --- | | `prefix` | `str` | The prefix the string must start with. | *required* |
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_starts_with(self: _Pipeline[_InT, str], prefix: str) -> _Pipeline[_InT, str]:
+    """Constrain a string value to start with a given prefix.
+
+    Args:
+        prefix: The prefix the string must start with.
+    """
+    return self.predicate(lambda v: v.startswith(prefix))
+
+```
+
+### str_ends_with
+
+```python
+str_ends_with(suffix: str) -> _Pipeline[_InT, str]
+
+```
+
+Constrain a string value to end with a given suffix.
+
+Parameters:
+
+| Name | Type | Description | Default | | --- | --- | --- | --- | | `suffix` | `str` | The suffix the string must end with. | *required* |
+
+Source code in `pydantic/experimental/pipeline.py`
+
+```python
+def str_ends_with(self: _Pipeline[_InT, str], suffix: str) -> _Pipeline[_InT, str]:
+    """Constrain a string value to end with a given suffix.
+
+    Args:
+        suffix: The suffix the string must end with.
+    """
+    return self.predicate(lambda v: v.endswith(suffix))
+
+```
+
 ### otherwise
 
 ```python
