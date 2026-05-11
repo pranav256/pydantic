@@ -5061,10 +5061,15 @@ according to the serialization schema of such instance, rather that the schema o
 This will expose all the data defined on the subclass in the serialized payload.</p>
 <p>This behavior can be configured in the following ways:</p>
 <ul>
-<li>Configuration level: use the <a class="autorefs autorefs-internal" href="../../api/config/#pydantic.config.ConfigDict.polymorphic_serialization"><code>polymorphic_serialization</code></a> setting
-  in the model/dataclass <a href="../config/">configuration</a>.</li>
-<li>Runtime level: use the <code>polymorphic_serialization</code> argument when calling the <a href="#serializing-data">serialization methods</a>.
-  This will apply to all (nested) types, overriding any configuration.</li>
+<li>
+<p>Configuration level: use the <a class="autorefs autorefs-internal" href="../../api/config/#pydantic.config.ConfigDict.polymorphic_serialization"><code>polymorphic_serialization</code></a> setting
+  in the model/dataclass <a href="../config/">configuration</a>. The configuration should be set on the class that should be polymorphic,
+  not on the class that references polymorphic classes.</p>
+</li>
+<li>
+<p>Runtime level: use the <code>polymorphic_serialization</code> argument when calling the <a href="#serializing-data">serialization methods</a>.
+  This will apply to all (nested) types, overriding any configuration.</p>
+</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Duck-typed serialization</p>
@@ -5085,7 +5090,7 @@ and <code>PolymorphicUserLogin</code> are defined as equivalents with <code>poly
 <div class="language-python highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>  <span class="c1"># (1)!</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 
 
@@ -5102,12 +5107,14 @@ and <code>PolymorphicUserLogin</code> are defined as equivalents with <code>poly
 <span class="p">)</span>
 
 
-<span class="nb">print</span><span class="p">(</span><span class="n">outer_model</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>  <span class="c1"># (1)!</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outer_model</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>  <span class="c1"># (2)!</span>
 <span class="c1">#&gt; {&#39;user&#39;: {&#39;name&#39;: &#39;pydantic&#39;}}</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">outer_model</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">polymorphic_serialization</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  <span class="c1"># (2)!</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outer_model</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">polymorphic_serialization</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  <span class="c1"># (3)!</span>
 <span class="c1">#&gt; {&#39;user&#39;: {&#39;name&#39;: &#39;pydantic&#39;, &#39;password&#39;: &#39;password&#39;}}</span>
 </code></pre></div>
 <ol>
+<li>The <code>polymorphic_serialization</code> configuration would be set on this model to get the same behavior as the
+   runtime setting below.</li>
 <li>With polymorphic serialization disabled, <code>user</code> serializes as the base type.</li>
 <li>With polymorphic serialization enabled, <code>user</code> serializes as the actual runtime subclass.</li>
 </ol>

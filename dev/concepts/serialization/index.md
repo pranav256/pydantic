@@ -535,7 +535,7 @@ Polymorphic serialization is the behavior of serializing a model (or [Pydantic d
 
 This behavior can be configured in the following ways:
 
-- Configuration level: use the polymorphic_serialization setting in the model/dataclass [configuration](../config/).
+- Configuration level: use the polymorphic_serialization setting in the model/dataclass [configuration](../config/). The configuration should be set on the class that should be polymorphic, not on the class that references polymorphic classes.
 - Runtime level: use the `polymorphic_serialization` argument when calling the [serialization methods](#serializing-data). This will apply to all (nested) types, overriding any configuration.
 
 Duck-typed serialization
@@ -554,7 +554,7 @@ We can then see the effect of serializing each of these types, and the interacti
 from pydantic import BaseModel
 
 
-class User(BaseModel):
+class User(BaseModel):  # (1)!
     name: str
 
 
@@ -571,13 +571,14 @@ outer_model = OuterModel(
 )
 
 
-print(outer_model.model_dump())  # (1)!
+print(outer_model.model_dump())  # (2)!
 #> {'user': {'name': 'pydantic'}}
-print(outer_model.model_dump(polymorphic_serialization=True))  # (2)!
+print(outer_model.model_dump(polymorphic_serialization=True))  # (3)!
 #> {'user': {'name': 'pydantic', 'password': 'password'}}
 
 ```
 
+1. The `polymorphic_serialization` configuration would be set on this model to get the same behavior as the runtime setting below.
 1. With polymorphic serialization disabled, `user` serializes as the base type.
 1. With polymorphic serialization enabled, `user` serializes as the actual runtime subclass.
 
