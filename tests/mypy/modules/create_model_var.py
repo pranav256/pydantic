@@ -1,3 +1,7 @@
+from typing import Any
+
+from typing_extensions import Self
+
 from pydantic import BaseModel, create_model
 
 
@@ -20,3 +24,11 @@ def dyn_model() -> type[BaseModel]:
         pass
 
     return Outer
+
+
+class ClassmethodModel(BaseModel):
+    @classmethod
+    def composite(cls) -> type[Self]:
+        # Ensures the mypy plugin defers to the `create_model()` overload:
+        model = create_model(cls.__name__, __base__=cls)
+        return model
